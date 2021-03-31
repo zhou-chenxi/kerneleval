@@ -22,7 +22,7 @@ class Circular:
 
 	kernel_single_eval(new_data)
 		Evaluates the circular kernel function at new_data involving double `for` loops;
-		less efficient than kernel_matrix.
+		less efficient than self.kernel_matrix.
 
 	"""
 	
