@@ -145,6 +145,7 @@ class Polynomial:
 			
 		return output
 	
+	
 if __name__ == '__main__':
 	
 	data1 = np.random.randn(500 * 3).reshape(500, 3)
