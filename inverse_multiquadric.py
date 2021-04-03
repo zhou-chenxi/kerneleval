@@ -15,6 +15,8 @@ class InverseMultiquadric:
 	bw : float
 		The bandwidth parameter in the inverse multiquadric kernel function;
 		must be strictly positive.
+	power : float
+		The power parameter in the inverse multiquadric kernel function; must be strictly positive.
 	
 	Methods
 	-------
@@ -27,7 +29,7 @@ class InverseMultiquadric:
 
 	"""
 	
-	def __init__(self, data, bw):
+	def __init__(self, data, bw, power):
 		
 		"""
 		Parameters
@@ -36,6 +38,9 @@ class InverseMultiquadric:
 			The array at which the inverse multiquadric kernel function is to evaluated.
 		bw : float
 			The bandwidth parameter in the inverse multiquadric kernel function;
+			must be strictly positive.
+		power : float
+			The power parameter in the inverse multiquadric kernel function;
 			must be strictly positive.
 		
 		"""
@@ -48,10 +53,16 @@ class InverseMultiquadric:
 		
 		self.data = data
 		self.N, self.d = self.data.shape
+		
 		if bw <= 0.:
 			raise ValueError(f'The bandwidth parameter, bw, must be strictly positive.')
 		else:
 			self.bw = bw
+		
+		if power <= 0.:
+			raise ValueError(f'The power parameter, power, must be strictly positive.')
+		else:
+			self.power = power
 	
 	def kernel_matrix(self, new_data):
 		
@@ -91,7 +102,7 @@ class InverseMultiquadric:
 		power = np.sum(np.vstack(np.split(diff, self.N * n, axis=1)), axis=1)
 		power = power.reshape(n, self.N)
 		
-		iq_part = 1. / np.sqrt(1. + power)
+		iq_part = (1. + power) ** (- self.power)
 		
 		return iq_part.T
 	
@@ -130,23 +141,23 @@ class InverseMultiquadric:
 		for i in range(self.N):
 			for j in range(n):
 				sq_norm = 1. + np.sum((self.data[i] - new_data[j]) ** 2) / self.bw ** 2
-				output[i][j] = 1. / np.sqrt(sq_norm)
+				output[i][j] = sq_norm ** (-self.power)
 				
 		return output
 
 
-# if __name__ == '__main__':
-#
-# 	data1 = np.random.randn(500 * 3).reshape(500, 3)
-# 	new_data1 = np.random.randn(1000 * 3).reshape(1000, 3)
-# 	kernel = InverseMultiquadric(data1, 2.0)
-# 	k1 = kernel.kernel_matrix(new_data1)
-# 	k2 = kernel.kernel_single_eval(new_data1)
-# 	print(np.allclose(k1, k2))
-#
-# 	data2 = np.random.randn(500)
-# 	new_data2 = np.random.randn(1000)
-# 	kernel = InverseMultiquadric(data2, 2.3)
-# 	k3 = kernel.kernel_matrix(new_data2)
-# 	k4 = kernel.kernel_single_eval(new_data2)
-# 	print(np.allclose(k3, k4))
+if __name__ == '__main__':
+
+	data1 = np.random.randn(500 * 3).reshape(500, 3)
+	new_data1 = np.random.randn(1000 * 3).reshape(1000, 3)
+	kernel = InverseMultiquadric(data1, 2.0, 0.356)
+	k1 = kernel.kernel_matrix(new_data1)
+	k2 = kernel.kernel_single_eval(new_data1)
+	print(np.allclose(k1, k2))
+
+	data2 = np.random.randn(500)
+	new_data2 = np.random.randn(1000)
+	kernel = InverseMultiquadric(data2, 2.3, 0.3567)
+	k3 = kernel.kernel_matrix(new_data2)
+	k4 = kernel.kernel_single_eval(new_data2)
+	print(np.allclose(k3, k4))
