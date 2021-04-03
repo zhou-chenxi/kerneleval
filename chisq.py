@@ -83,7 +83,7 @@ class ChiSquare:
 		prod1 = tiled_data * tiled_land
 		sum1 = tiled_data + tiled_land
 		
-		power = np.sum(np.vstack(np.split(prod1 / sum1, self.N * n, axis=1)), axis=1)
+		power = 2. * np.sum(np.vstack(np.split(prod1 / sum1, self.N * n, axis=1)), axis=1)
 		output = power.reshape(n, self.N)
 		
 		return output.T
@@ -124,7 +124,7 @@ class ChiSquare:
 			for j in range(n):
 				s = 0
 				for k in range(self.d):
-					s += 2. * self.data[i][k] * new_data[j][k] / (self.data[i][k] * new_data[j][k])
+					s += 2. * self.data[i][k] * new_data[j][k] / (self.data[i][k] + new_data[j][k])
 				
 				output[i][j] = s
 				
